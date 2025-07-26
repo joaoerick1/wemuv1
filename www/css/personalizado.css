@@ -1,0 +1,96 @@
+/* Define a fonte a ser usada em todo o aplicativo */
+:root {
+  --f7-font-family: 'Poppins', sans-serif;
+}
+
+/* Estilos Gerais e Tema Escuro */
+:root {
+  --f7-theme-color: #7E4DFF; /* Roxo principal */
+  --f7-navbar-bg-color: #1a1a1a;
+  --f7-page-bg-color: #121212;
+  --f7-block-strong-bg-color: #2c2c2e;
+  --f7-card-bg-color: #2c2c2e;
+  --f7-text-color: #ffffff;
+  --f7-navbar-text-color: #ffffff;
+  --f7-navbar-link-color: #ffffff;
+  --f7-toolbar-bg-color: #1a1a1a;
+  --f7-tabbar-link-inactive-color: #8e8e93;
+  --f7-tabbar-link-active-color: var(--f7-theme-color);
+  --f7-block-title-text-color: #ffffff;
+  --f7-card-header-text-color: #ffffff;
+}
+
+/* Deixa a barra de status do celular escura */
+.statusbar {
+  background: #1a1a1a;
+}
+
+/* Estilo do Título na Barra de Navegação */
+.navbar .title {
+    font-weight: 600;
+}
+
+/* Conteúdo da Página */
+.page-content {
+    padding-top: 15px;
+}
+
+/* Título dos Blocos (Ex: "Mais Populares") */
+.block-title {
+    font-weight: 500;
+    font-size: 18px;
+    margin-left: 16px; /* Alinhamento com os cards */
+}
+
+/* Estilo para o card do mapa */
+.map-card {
+    height: 150px;
+    width: calc(100% - 32px); /* Para manter as margens laterais */
+    border-radius: 15px;
+    margin: 0 16px 25px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    object-fit: cover; /* Garante que a imagem cubra o espaço */
+}
+
+/* Grid de Produtos */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 0 16px;
+}
+
+/* Cards de Produto Individuais */
+.product-card {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.product-card .card-content {
+    padding: 10px;
+}
+
+.product-card img {
+    display: block;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.product-card h3 {
+    font-size: 14px;
+    margin: 5px 0;
+    font-weight: 500;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-card p {
+    font-size: 14px;
+    color: var(--f7-theme-color);
+    margin: 0;
+    font-weight: 600;
+}

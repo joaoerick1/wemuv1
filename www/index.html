@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>WEMUV</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="lib/framework7-bundle.min.css">
+    <link rel="stylesheet" href="css/icons.css">
+    <link rel="stylesheet" href="css/personalizado.css"> 
+</head>
+<body>
+    <div id="app">
+        <div class="statusbar"></div>
+        <div class="view view-main view-init view-tabs safe-areas">
+            <div class="toolbar toolbar-bottom">
+                <div class="toolbar-inner">
+                    <a href="#view-home" class="tab-link tab-link-active"><i class="icon f7-icons">house_fill</i></a>
+                    <a href="#view-catalog" class="tab-link"><i class="icon f7-icons">square_grid_2x2_fill</i></a>
+                    <a href="#view-orders" class="tab-link"><i class="icon f7-icons">bag_fill</i></a>
+                    <a href="#view-profile" class="tab-link"><i class="icon f7-icons">person_fill</i></a>
+                </div>
+            </div>
+            <div id="view-home" class="view tab tab-active"></div>
+            <div id="view-catalog" class="view tab"></div>
+            <div id="view-orders" class="view tab"></div>
+            <div id="view-profile" class="view tab"></div>
+        </div>
+    </div>
+
+    <div class="popup" id="checkout-popup">
+        <div class="view">
+            <div class="page">
+                <div class="navbar"><div class="navbar-bg"></div><div class="navbar-inner"><div class="title">Confirmar Pedido</div><div class="right"><a href="#" class="link popup-close">Fechar</a></div></div></div>
+                <div class="page-content">
+                    <div class="block-title">Resumo do Pedido</div>
+                    <div class="list"><ul><li><div class="item-content"><div class="item-inner"><div class="item-title">Total a Pagar</div><div class="item-after" id="popup-total-price" style="font-weight: bold;"></div></div></div></li></ul></div>
+                    <div class="block"><p>Ao confirmar, seu pedido será processado.</p></div>
+                    <div class="block"><a href="#" class="button button-large button-fill color-green" id="confirm-purchase-button">Confirmar Compra</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="lib/framework7-bundle.min.js"></script>
+    
+    <script>
+      // 1. Variáveis Globais e Dados (DEFINIDOS PRIMEIRO)
+      var $$ = Dom7;
+      let cartItems = [];
+      const products = [
+        {id: 1, name: 'Kit Skincare Premium', price: 'R$ 185,00', imageUrl: 'https://i.imgur.com/gKEM2v6.png', description: 'Um kit completo para revitalizar sua pele.'},
+        {id: 2, name: 'Perfume Elegance', price: 'R$ 320,00', imageUrl: 'https://i.imgur.com/f2S2R5W.png', description: 'Fragrância marcante com notas amadeiradas.'},
+        {id: 3, name: 'Creme Facial Noturno', price: 'R$ 95,00', imageUrl: 'https://i.imgur.com/f2S2R5W.png', description: 'Creme de reparação noturna que age enquanto você dorme.'},
+        {id: 4, name: 'Óleo Essencial de Lavanda', price: 'R$ 75,00', imageUrl: 'https://i.imgur.com/gKEM2v6.png', description: 'Óleo 100% puro com propriedades relaxantes.'},
+      ];
+
+      // 2. Definição das Rotas (USA 'products')
+      var routes = [
+        { path: '/', name: 'home', viewName: 'view-home', async: function ({ resolve }) { const featuredProducts = products.slice(0, 2); resolve({ component: { template: `<div class="page"><div class="navbar"><div class="navbar-bg"></div><div class="navbar-inner"><div class="title">Explore</div><div class="right"><a href="/cart/" class="link cart-link"><i class="icon f7-icons">cart</i></a></div></div></div><div class="page-content"><img class="map-card" src="https://i.imgur.com/8O1REyD.png" alt="Mapa"><div class="block-title">Mais Populares</div><div class="product-grid">{{#each products}}<a href="/product/{{this.id}}/" class="card product-card"><img src="{{this.imageUrl}}" alt="{{this.name}}"><div class="card-content"><h3>{{this.name}}</h3><p>{{this.price}}</p></div></a>{{/each}}</div></div></div>`, context: {products: featuredProducts}}});}},
+        { path: '/catalog/', name: 'catalog', viewName: 'view-catalog', async: function ({ resolve }) { resolve({ component: { template: `<div class="page searchbar-found"><div class="navbar"><div class="navbar-bg"></div><div class="navbar-inner"><div class="title">Catálogo</div><div class="right"><a href="/cart/" class="link cart-link"><i class="icon f7-icons">cart</i></a></div><div class="subnavbar"><form class="searchbar" data-search-container=".search-list" data-search-in=".item-title"><div class="searchbar-inner"><div class="searchbar-input-wrap"><input type="search" placeholder="Buscar produtos"><i class="searchbar-icon"></i><span class="input-clear-button"></span></div><span class="searchbar-disable-button if-not-aurora">Cancelar</span></div></form></div></div></div><div class="page-content"><div class="product-grid search-list" style="padding-top: 60px;">{{#each products}}<a href="/product/{{this.id}}/" class="card product-card"><img src="{{this.imageUrl}}" alt="{{this.name}}"><div class="card-content"><h3 class="item-title">{{this.name}}</h3><p>{{this.price}}</p></div></a>{{/each}}</div><div class="block searchbar-not-found"><div class="block-inner text-align-center">Nenhum produto encontrado.</div></div></div></div>`, context: {products: products}}});}},
+        { path: '/orders/', name: 'orders', viewName: 'view-orders', component: { template: `<div class="page"><div class="navbar"><div class="navbar-bg"></div><div class="navbar-inner"><div class="title">Meus Pedidos</div></div></div><div class="page-content"><div class="block"><div class="segmented segmented-strong"><a class="button button-active" href="#">Ativos</a><a class="button" href="#">Concluídos</a></div></div><div class="block-title">Pedidos Ativos</div><div class="list media-list"><ul><li><a href="#" class="item-link item-content"><div class="item-media"><img src="https://i.imgur.com/gKEM2v6.png" width="60" style="border-radius: 8px;" /></div><div class="item-inner"><div class="item-title-row"><div class="item-title">Kit Skincare</div><div class="item-after"><span class="badge color-orange">A caminho</span></div></div><div class="item-subtitle">Pedido #2025-07A</div></div></a></li></ul></div></div></div>`}},
+        { path: '/profile/', name: 'profile', viewName: 'view-profile', component: { template: `<div class="page"><div class="navbar"><div class="navbar-bg"></div><div class="navbar-inner"><div class="title">Meu Perfil</div></div></div><div class="page-content"><div class="list media-list" style="margin-top: 0;"><ul><li><div class="item-content"><div class="item-media"><img src="img/user.jpg" width="60" style="border-radius: 50%;" /></div><div class="item-inner"><div class="item-title-row"><div class="item-title" style="font-weight: 600;">Usuário WEMUV</div></div><div class="item-subtitle">usuario@email.com</div></div></div></li></ul></div><div class="block-title">Configurações</div><div class="list"><ul><li><a href="#" class="item-link item-content"><div class="item-media"><i class="icon f7-icons">person_crop_circle</i></div><div class="item-inner"><div class="item-title">Editar Perfil</div></div></a></li><li><a href="#" class="item-link item-content"><div class="item-media"><i class="icon f7-icons">bell</i></div><div class="item-inner"><div class="item-title">Notificações</div></div></a></li></ul></div><div class="block" style="margin-top: 30px;"><a href="#" class="button button-fill color-red">Sair</a></div></div></div>`}},
+        { path: '/product/:id/', async: function ({ to, resolve }) { const productId = parseInt(to.params.id); const productData = products.find(p => p.id === productId); resolve({component: {template: `<div class="page"><div class="navbar"><div class="navbar-bg"></div><div class="navbar-inner"><div class="left"><a href="#" class="link back"><i class="icon f7-icons">arrow_left</i></a></div><div class="title">{{product.name}}</div></div></div><div class="page-content"><div class="product-image-large" style="background-image:url({{product.imageUrl}})"></div><div class="block-title large-title">{{product.name}}</div><div class="block block-strong inset"><div class="price">{{product.price}}</div><p>{{product.description}}</p></div><div class="block"><a href="#" class="button button-large button-fill add-to-cart-button" data-product-id="{{product.id}}">Adicionar ao Carrinho</a></div></div></div>`, context: {product: productData}}});}},
+        { path: '/cart/', name: 'cart', async: function ({ resolve }) { let totalPrice = 0; cartItems.forEach(item => { const priceNumber = parseFloat(item.price.replace('R$ ', '').replace(',', '.')); totalPrice += priceNumber; }); const formattedTotal = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`; resolve({ component: { template: `<div class="page"><div class="navbar"><div class="navbar-bg"></div><div class="navbar-inner"><div class="left"><a href="#" class="link back"><i class="icon f7-icons">arrow_left</i></a></div><div class="title">Meu Carrinho</div></div></div><div class="page-content">{{#if items.length > 0}}<div class="list media-list"><ul>{{#each items}}<li class="swipeout"><div class="item-content swipeout-content"><div class="item-media"><img src="{{this.imageUrl}}" width="60" style="border-radius: 8px;" /></div><div class="item-inner"><div class="item-title-row"><div class="item-title">{{this.name}}</div></div><div class="item-subtitle" style="font-weight: 600;">{{this.price}}</div></div></div><div class="swipeout-actions-right"><a href="#" class="swipeout-delete remove-from-cart-link" data-product-id="{{this.id}}">Remover</a></div></li>{{/each}}</ul></div><div class="block-title">Resumo</div><div class="card card-outline"><div class="card-content card-content-padding"><div class="display-flex justify-content-space-between"><span>Subtotal</span><span>{{total}}</span></div><div class="display-flex justify-content-space-between"><span>Frete</span><span>Grátis</span></div><hr><div class="display-flex justify-content-space-between" style="font-weight: bold; font-size: 18px;"><span>Total</span><span>{{total}}</span></div></div></div><div class="block"><a href="#" class="button button-large button-fill checkout-button">Finalizar Compra</a></div>{{else}}<div class="block text-align-center" style="padding-top: 50px;"><i class="icon f7-icons" style="font-size: 80px; color: #888;">cart</i><p style="font-size: 18px; color: #888; margin-top: 20px;">Seu carrinho está vazio.</p></div>{{/if}}</div></div>`, context: {items: cartItems, total: formattedTotal}}});}}
+      ];
+
+      // 3. Inicialização do App (USA 'routes')
+      var app = new Framework7({
+        el: '#app',
+        name: 'WEMUV',
+        id: 'com.wemuv.app',
+        statusbar: { enabled: true },
+        routes: routes,
+      });
+
+      // 4. Lógica do Aplicativo e Eventos
+      var viewHome = app.views.create('#view-home', { url: '/' });
+      var viewCatalog = app.views.create('#view-catalog', { url: '/catalog/' });
+      var viewOrders = app.views.create('#view-orders', { url: '/orders/' });
+      var viewProfile = app.views.create('#view-profile', { url: '/profile/' });
+
+      function updateCartBadge() { const cartLinks = $$('.cart-link'); if (cartItems.length > 0) { cartLinks.html(`<i class="icon f7-icons">cart_fill</i><span class="badge color-red">${cartItems.length}</span>`); } else { cartLinks.html(`<i class="icon f7-icons">cart</i>`); }}
+      function addToCart(productId) { const productToAdd = products.find(p => p.id === productId); if (productToAdd) { cartItems.push(productToAdd); app.toast.create({ text: `${productToAdd.name} foi adicionado ao carrinho!`, position: 'bottom', closeTimeout: 2000, cssClass: 'color-theme-green' }).open(); updateCartBadge(); }}
+      function removeFromCart(productId) { const itemIndex = cartItems.findIndex(item => item.id === productId); if (itemIndex > -1) { cartItems.splice(itemIndex, 1); updateCartBadge(); if (app.views.current.router.currentRoute.path === '/cart/') { app.views.current.router.refreshPage(); }}}
+      function calculateTotal() { let totalPrice = 0; cartItems.forEach(item => { const priceNumber = parseFloat(item.price.replace('R$ ', '').replace(',', '.')); totalPrice += priceNumber; }); return `R$ ${totalPrice.toFixed(2).replace('.', ',')}`; }
+      
+      $$(document).on('click', '.add-to-cart-button', function() { addToCart(parseInt($$(this).data('product-id'))); });
+      $$(document).on('click', '.remove-from-cart-link', function() { removeFromCart(parseInt($$(this).data('product-id'))); app.swipeout.close($$(this).closest('.swipeout')); });
+      $$(document).on('click', '.checkout-button', function() { $$('#popup-total-price').text(calculateTotal()); app.popup.open('#checkout-popup'); });
+      $$(document).on('click', '#confirm-purchase-button', function() { app.popup.close('#checkout-popup'); app.dialog.alert('Seu pedido foi realizado com sucesso!', 'Compra Confirmada', function() { cartItems = []; updateCartBadge(); app.tab.show('#view-home'); if (app.views.get('#view-catalog')) { app.views.get('#view-catalog').router.refreshPage(); } }); });
+      $$(document).on('page:init', function() { updateCartBadge(); });
+    </script>
+</body>
+</html>
